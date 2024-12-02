@@ -1,34 +1,46 @@
 use std::fs::read_to_string;
-
+use std::env;
 fn main() {
-    let mut list1: Vec<i32> = Vec::new();
-    let mut list2: Vec<i32>  = Vec::new();
+    env::set_var("RUST_BACKTRACE", "1");
+    let mut report_list: Vec<Vec<i32>> = Vec::new();
 
-    for line in read_to_string("data/day1_data.txt").unwrap().lines() {
+    for line in read_to_string("data/day2_data_small.txt").unwrap().lines() {
         let tmp = line.split(' ').flat_map(str::parse::<i32>).collect::<Vec<_>>();
-        list1.push(tmp[0]);
-        list2.push(tmp[1]);
-    }
-    list1.sort();
-    list2.sort();
-    
-
-    // part 1
-    let mut res1 = 0;
-
-    for values in list1.iter().zip(&list2) {
-        res1 += (values.0 - values.1).abs();
+        report_list.push(tmp);
     }
 
-    println!("{}", res1);
+    let mut safe = 0;
 
-    // part 2
-    let mut res2: i32 = 0;
-
-    for number in &list1 {
-        res2 += number*list2.iter().filter(|&x| x == number).count() as i32;
+    for _report in report_list {
+        '_outer: for j in 0.._report.len() {
+            let mut report = _report.clone();
+            report.remove(j);
+            let mut biggest_diff = 0;
+            let mut last_element = report[0];
+            let mut safe_up = true;
+            let mut safe_down = true;
+            for i in 1..report.len() {
+                if last_element > report[i] {
+                    safe_up = false;
+                } else if last_element < report[i] {
+                    safe_down = false;
+                }
+                if last_element == report[i] {
+                    safe_down = false;
+                    safe_up = false;
+                }
+                if biggest_diff < (last_element - report[i]).abs() {
+                    biggest_diff = (last_element - report[i]).abs();
+                }
+                last_element = report[i];
+            }
+            if (safe_down | safe_up ) & (biggest_diff < 4) {
+                safe += 1;
+                break '_outer;
+            }
+        }
     }
 
-    println!("{}", res2);
+    println!("{}", safe);
 
 }
