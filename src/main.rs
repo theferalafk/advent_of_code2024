@@ -4,7 +4,7 @@ fn main() {
     env::set_var("RUST_BACKTRACE", "1");
     let mut report_list: Vec<Vec<i32>> = Vec::new();
 
-    for line in read_to_string("data/day2_data_small.txt").unwrap().lines() {
+    for line in read_to_string("data/day2_data.txt").unwrap().lines() {
         let tmp = line.split(' ').flat_map(str::parse::<i32>).collect::<Vec<_>>();
         report_list.push(tmp);
     }
