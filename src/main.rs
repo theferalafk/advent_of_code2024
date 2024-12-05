@@ -1,46 +1,49 @@
 use std::fs::read_to_string;
-use std::env;
+use regex::Regex;
 fn main() {
-    env::set_var("RUST_BACKTRACE", "1");
-    let mut report_list: Vec<Vec<i32>> = Vec::new();
 
-    for line in read_to_string("data/day2_data.txt").unwrap().lines() {
-        let tmp = line.split(' ').flat_map(str::parse::<i32>).collect::<Vec<_>>();
-        report_list.push(tmp);
-    }
+    let mut memory = read_to_string("data/day3_data.txt").unwrap();
 
-    let mut safe = 0;
+    let remover1 = Regex::new(r"don't\(\).+?don't\(\)").unwrap();
 
-    for _report in report_list {
-        '_outer: for j in 0.._report.len() {
-            let mut report = _report.clone();
-            report.remove(j);
-            let mut biggest_diff = 0;
-            let mut last_element = report[0];
-            let mut safe_up = true;
-            let mut safe_down = true;
-            for i in 1..report.len() {
-                if last_element > report[i] {
-                    safe_up = false;
-                } else if last_element < report[i] {
-                    safe_down = false;
-                }
-                if last_element == report[i] {
-                    safe_down = false;
-                    safe_up = false;
-                }
-                if biggest_diff < (last_element - report[i]).abs() {
-                    biggest_diff = (last_element - report[i]).abs();
-                }
-                last_element = report[i];
-            }
-            if (safe_down | safe_up ) & (biggest_diff < 4) {
-                safe += 1;
-                break '_outer;
-            }
+    let mut test = memory.clone();
+
+    for _i in 0..3 {
+    for res in remover1.find_iter(&test.clone()).map(|m| m.as_str()) {
+        if !res.contains("do()"){
+            test = test.replace(res, "don't()");
         }
     }
 
-    println!("{}", safe);
+    }
+
+    println!("{} {}",memory.len(),test.len());
+
+    let remover2 = Regex::new(r"don't\(\).*?do\(\)").unwrap();
+
+    memory = remover2.replace_all(&memory, "").to_string();
+
+    test = remover2.replace_all(&test, "").to_string();
+
+
+    println!("{} {} {} {}",memory.len(),test.len(), memory.contains(  "don't()"), test.contains("don't()"));
+
+    let re = Regex::new(r"mul\((?<a>[\d]{1,3}),(?<b>[\d]{1,3})\)").unwrap();
+
+    let a_b: Vec<(i32, i32)> = re.captures_iter(&memory).map(|caps| {
+        let (_, [a, b]) = caps.extract();
+        (a.parse::<i32>().unwrap(), b.parse::<i32>().unwrap())
+    }).collect();
+
+    //println!("{:?}",a_b);
+
+    let mut res = 0;
+
+    for (a, b) in a_b {
+        res += a*b;
+    }
+
+    println!("{res}");
+    
 
 }
