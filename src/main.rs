@@ -1,51 +1,22 @@
 use std::fs::read_to_string;
+
+
 fn main() {
 
-    let raw_data = read_to_string("data/day5_data.txt").unwrap();
+    let raw_data = read_to_string("data/day6_data.txt").unwrap();
 
-    let tmp = raw_data.split("\n\n").collect::<Vec<&str>>();
+    let mut direction = 0; //0 up, 1 right, 2 down, 3 left mod 4
 
-    let rules = tmp[0].split("\n").collect::<Vec<&str>>();
+    let move_direction = [(1, 0), (0, 1), (-1, 0), (0, -1)];
 
-    let mut res = 0;
+    let mut position = (1, 4);
 
-    for prints in tmp[1].split("\n") {
-        //create opposing rule
+    let mut visited = 0;
 
-        let mut numbers = prints.split(",").collect::<Vec<&str>>();
+    
 
-        let mut valid = true;
+    //was ist mein workflow: -> finde den guard, starting direction ist up -> setze x auf aktueller position visited +1 (falls x schon gesetzt pass)
+    // -> addiere entsprechend der richtung
 
-        let mut i = 1;
-        let mut j = 0;
-
-        while i < numbers.len() {
-            'inner: while j < i {
-                if rules.contains(&format!("{}|{}", numbers[i], numbers[j]).as_str()) {
-                    valid = false;
-                    // element i muss dann vor j gepackt werden
-                    let tmp = numbers.remove(i);
-                    numbers.insert(j, tmp);
-                    i = 0;
-                    j = 0;
-                    break 'inner
-                }
-                j += 1;
-            }
-            i += 1;
-        }
-        if !valid {
-            res += numbers[numbers.len()/2].parse::<i32>().unwrap();
-        }
-        /*
-        println!("opposing rules {:?}", opposing_rules);
-
-        println!("rules {:?}", rules);
-
-        println!(" thing tried {:?}", prints);
-        */
-        //check for exisiting rules
-    }
-
-    println!("{res}");
+    
 }
